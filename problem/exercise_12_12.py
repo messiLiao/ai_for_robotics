@@ -35,7 +35,7 @@ delta = [[-1, 0 ], # go up
 
 delta_name = ['^', '<', 'v', '>']
 
-def _search(grid,init,goal,cost):
+def _search(grid,init,goal,cost, heuristic):
     # ----------------------------------------
     # insert code here
     # ----------------------------------------
@@ -106,27 +106,32 @@ def search(grid,init,goal,cost,heuristic):
     x = init[0]
     y = init[1]
     g = 0
+    h = heuristic[x][y]
+    f = g + h
 
-    open = [[g, x, y]]
+    open = [[f, g, h, x, y]]
 
     found = False  # flag that is set when search is complete
     resign = False # flag set if we can't find expand
     count = 0
     
     while not found and not resign:
+        # print open, "->",
         if len(open) == 0:
             resign = True
             return "Fail"
         else:
             open.sort()
             open.reverse()
+            # print open, '->',
             next = open.pop()
-            x = next[1]
-            y = next[2]
-            g = next[0]
+            # print open
+            x = next[3]
+            y = next[4]
+            g = next[1]
             expand[x][y] = count
             count += 1
-            
+
             if x == goal[0] and y == goal[1]:
                 found = True
             else:
@@ -136,7 +141,9 @@ def search(grid,init,goal,cost,heuristic):
                     if x2 >= 0 and x2 < len(grid) and y2 >=0 and y2 < len(grid[0]):
                         if closed[x2][y2] == 0 and grid[x2][y2] == 0:
                             g2 = g + cost
-                            open.append([g2, x2, y2])
+                            h2 = heuristic[x2][y2]
+                            f2 = g2 + h2
+                            open.append([f2, g2, h2, x2, y2])
                             closed[x2][y2] = 1
 
     return expand
